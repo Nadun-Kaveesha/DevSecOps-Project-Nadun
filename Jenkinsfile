@@ -75,7 +75,7 @@ pipeline{
                         sed -i "s|image: nadun2005/netflix:latest|image: nadun2005/netflix:V${BUILD_NUMBER}|g" helm/templates/deployment.yml
                         git add .
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
                     '''
                 }
             }
