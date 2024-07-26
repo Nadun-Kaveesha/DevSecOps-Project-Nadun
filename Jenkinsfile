@@ -61,14 +61,23 @@ pipeline{
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image nadun2005/netflix:V${BUILD_NUMBER} > trivyimage.txt" 
+        stage('Update Deployment File') {
+            environment {
+                GIT_REPO_NAME = "DevSecOps-Project-Nadun"
+                GIT_USER_NAME = "Nadun-Kaveesha"
             }
-        }
-        stage('Deploy to container'){
-            steps{
-                sh 'docker run -d --name netflix -p 8081:80 nadun2005/netflix:V${BUILD_NUMBER}'
+            steps {
+                withCredentials([string(credentialsId: 'Githubtoken', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config user.email "nadunkaveesha2018@gmail.com"
+                        git config user.name "Nadun-Kaveesha"
+                        BUILD_NUMBER=${BUILD_NUMBER}
+                        sed -i "s|image: nadun2005/netflix:latest|image: nadun2005/netflix:V${BUILD_NUMBER}|g" helm/templates/deployment.yml
+                        git add .
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
+                }
             }
         }
     }
